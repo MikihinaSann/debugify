@@ -1,0 +1,32 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+
+# IGNORE_ALL_VERSION so client/server can differ in presence (matches Fabric behaviour where Debugify is optional on both sides)
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+authors="${mod_authors}"
+description='''
+${mod_description}
+
+License stuff:
+j-Tai's TieFix - Code used licensed under LGPLv3
+FlashyReese's Sodium Extra - Code used licensed under LGPLv3
+Ampflower's 2x2 Surrounded Saplings Fix - Code used licensed under Zlib
+'''
+
+[[dependencies.${mod_id}]]
+    modId="forge"
+    mandatory=true
+    versionRange="${forge_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
