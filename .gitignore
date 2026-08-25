@@ -26,3 +26,4 @@ forge*changelog.txt
 
 # Extracted bytecode/class files from debugging
 net/
+.commit-msg.txt

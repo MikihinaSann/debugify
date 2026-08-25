@@ -2,6 +2,7 @@ package dev.isxander.debugify;
 
 import dev.isxander.debugify.config.DebugifyConfig;
 import dev.isxander.debugify.fixes.BugFix;
+import dev.isxander.debugify.fixes.BugFixData;
 import dev.isxander.debugify.mixinplugin.DebugifyErrorHandler;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -49,6 +50,27 @@ public class Debugify {
                 .map(entry -> entry.getKey().bugId())
                 .toList();
         LOGGER.info("Enabled {} bug fixes: {}", enabledBugs.size(), enabledBugs);
+
+        // Report fixes that were skipped because the bug was already fixed
+        // by Forge or another mod (injection targets not found).
+        var alreadyFixed = dev.isxander.debugify.mixinplugin.DebugifyErrorHandler.getAlreadyFixed();
+        if (!alreadyFixed.isEmpty()) {
+            List<String> skipped = alreadyFixed.stream()
+                    .map(BugFixData::bugId)
+                    .sorted()
+                    .toList();
+            LOGGER.info("Skipped {} bug fixes (already fixed by Forge or another mod): {}", skipped.size(), skipped);
+        }
+
+        var errored = dev.isxander.debugify.mixinplugin.DebugifyErrorHandler.getErrored();
+        if (!errored.isEmpty()) {
+            List<String> errors = errored.stream()
+                    .map(BugFixData::bugId)
+                    .sorted()
+                    .toList();
+            LOGGER.warn("Failed to apply {} bug fixes: {}", errors.size(), errors);
+        }
+
         LOGGER.info("Successfully Debugify'd your game!");
     }
 
