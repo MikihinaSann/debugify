@@ -1,5 +1,11 @@
 # Debugify Forge 1.20.1 — Changelog
 
+## 1.20.1+1.1
+
+### Fixed
+
+- **Critical: startup crash in production installs** — Both mixin configs were missing the `refmap` entry, so the runtime never loaded `debugify.mixins.refmap.json`. On production Forge 1.20.1 (SRG-mapped runtime), annotation targets stayed in Mojang names and every name-based injection failed — most visibly the MC-223153 `BlocksMixin`, which crashed startup with `InjectionError: Critical injection failure: Callback method addCopperSound(...) failed injection check, (0/1) succeeded` because `Blocks` class-loads during bootstrap. Development runs were unaffected (dev uses Mojang names), which is why the crash only appeared on players' installs. Both `debugify.mixins.json` and `debugify.client.mixins.json` now reference the refmap, so fixes actually apply in production instead of failing.
+
 ## 1.20.1+1.0 (Initial Forge Release)
 
 ### Added

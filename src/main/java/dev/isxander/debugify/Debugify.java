@@ -27,7 +27,7 @@ public class Debugify {
         onInitialize();
         // Allow client/server to differ in presence (matches Fabric behaviour where Debugify is optional on both sides).
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class,
-                () -> new IExtensionPoint.DisplayTest(() -> "1.20.1+1.0", (remoteVersion, isRemote) -> true));
+                () -> new IExtensionPoint.DisplayTest(() -> "1.20.1+1.1", (remoteVersion, isRemote) -> true));
 
         // Client-only setup (config screen registration + description cache) is routed
         // through DistExecutor so client classes are never class-loaded on a dedicated server.

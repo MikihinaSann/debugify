@@ -16,7 +16,7 @@ A Forge port of [isXander's Debugify](https://github.com/isXander/Debugify) for 
 ## Installation
 
 1. Install [Minecraft Forge 47.x](https://files.minecraftforge.net/) for Minecraft 1.20.1.
-2. Place the `debugify-1.20.1+1.0.jar` file in your `.minecraft/mods` folder (client) or `mods/` folder (server).
+2. Place the `debugify-1.20.1+1.1.jar` file in your `.minecraft/mods` folder (client) or `mods/` folder (server).
 3. Launch the game. The mod works out of the box with sensible defaults.
 
 **Server installation:** Drop the jar in your server's `mods/` folder. Server-side fixes (32 mixins) apply automatically to all connected players. No client-side installation required for server fixes.
