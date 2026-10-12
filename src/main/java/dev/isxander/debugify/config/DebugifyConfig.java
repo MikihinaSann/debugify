@@ -5,7 +5,7 @@ import dev.isxander.debugify.fixes.BugFixData;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import net.fabricmc.loader.api.FabricLoader;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,7 +13,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class DebugifyConfig {
-    private final Path configPath = Path.of("config", "debugify.json");
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private final Map<String, Boolean> jsonBugFixes = new HashMap<>();
@@ -24,6 +23,12 @@ public class DebugifyConfig {
     public boolean gameplayFixesInMultiplayer = false;
 
     private boolean preloaded = false;
+
+    // Resolved lazily: FMLPaths is guaranteed set by the time config is used,
+    // but this class is first instantiated during early mixin loading.
+    private Path configPath() {
+        return FMLPaths.CONFIGDIR.get().resolve("debugify.json");
+    }
 
     public void registerBugFix(BugFixData bugFix) {
         if (bugFixes.containsKey(bugFix))
@@ -37,10 +42,15 @@ public class DebugifyConfig {
         if (preloaded) return;
         preloaded = true;
 
+        Path configPath = configPath();
         if (!Files.exists(configPath)) {
-            if (FabricLoader.getInstance().isModLoaded("yosbr")
-                    && Files.exists(configPath.getParent().resolve("yosbr/" + configPath.getFileName().toString()))) {
-                throw new YosbrError();
+            try {
+                if (Debugify.isModLoaded("yosbr")
+                        && Files.exists(configPath.getParent().resolve("yosbr/" + configPath.getFileName().toString()))) {
+                    throw new YosbrError();
+                }
+            } catch (Throwable ignored) {
+                // ModList may not be available yet during early mixin loading
             }
             return;
         }
@@ -75,6 +85,7 @@ public class DebugifyConfig {
 
     public void save() {
         Debugify.LOGGER.info("Saving Debugify");
+        Path configPath = configPath();
         try {
             Files.deleteIfExists(configPath);
 

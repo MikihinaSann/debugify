@@ -1,0 +1,63 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+issueTrackerURL="https://github.com/isXander/Debugify/issues"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+authors="${mod_authors}"
+displayURL="https://isxander.dev"
+logoFile="debugify.png"
+credits=""
+description='''
+${mod_description}
+
+License stuff:
+j-Tai's TieFix - Code used licensed under LGPLv3
+FlashyReese's Sodium Extra - Code used licensed under LGPLv3
+Ampflower's 2x2 Surrounded Saplings Fix - Code used licensed under Zlib
+'''
+
+# Common (client+server) mixin config
+[[mixins]]
+config="${mod_id}.mixins.json"
+
+# Client-only mixin config (its mixins live in the config's "client" list,
+# so they are skipped on dedicated servers)
+[[mixins]]
+config="${mod_id}.client.mixins.json"
+
+# Access transformers replacing upstream's Fabric access widener.
+# Auto-detected at META-INF/accesstransformer.cfg, declared explicitly for clarity.
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"
+
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="[${neo_version},)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+# Third-party mods can ask Debugify to disable one or more bug fixes via
+# modproperties in their own neoforge.mods.toml (the NeoForge equivalent of
+# upstream's "debugify" Fabric entrypoint):
+#
+#   [modproperties]
+#       [modproperties.debugify]
+#           disabled_fixes = ["MC-12345", "MC-6789"]
+#           [modproperties.debugify.provided_disabled_fixes]
+#               some_other_mod = ["MC-1111"]
+#
+# "disabled_fixes" marks fixes that this mod itself conflicts with.
+# "provided_disabled_fixes" maps a mod id to bug ids it already fixes;
+# those fixes are only disabled when that mod id is installed.

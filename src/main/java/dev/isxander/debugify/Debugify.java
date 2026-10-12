@@ -2,10 +2,13 @@ package dev.isxander.debugify;
 
 import dev.isxander.debugify.config.DebugifyConfig;
 import dev.isxander.debugify.fixes.BugFix;
+import dev.isxander.debugify.fixes.BugFixData;
 import dev.isxander.debugify.mixinplugin.DebugifyErrorHandler;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.Version;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixins;
@@ -13,10 +16,17 @@ import org.spongepowered.asm.mixin.Mixins;
 import java.util.List;
 import java.util.Map;
 
+@Mod(Debugify.MODID)
 public class Debugify {
+    public static final String MODID = "debugify";
     public static final Logger LOGGER = LoggerFactory.getLogger("Debugify");
-    public static final Version VERSION = FabricLoader.getInstance().getModContainer("debugify").orElseThrow().getMetadata().getVersion();
     public static final DebugifyConfig CONFIG = new DebugifyConfig();
+
+    public Debugify(ModContainer container) {
+        onInitialize();
+        // Debugify registers no network channels, so NeoForge never requires it
+        // on the remote side — matching upstream's optional-everywhere behaviour.
+    }
 
     /**
      * Called from mixin plugin to manage
@@ -34,10 +44,46 @@ public class Debugify {
                 .map(entry -> entry.getKey().bugId())
                 .toList();
         LOGGER.info("Enabled {} bug fixes: {}", enabledBugs.size(), enabledBugs);
+
+        var alreadyFixed = DebugifyErrorHandler.getAlreadyFixed();
+        if (!alreadyFixed.isEmpty()) {
+            List<String> skipped = alreadyFixed.stream()
+                    .map(BugFixData::bugId)
+                    .sorted()
+                    .toList();
+            LOGGER.info("Skipped {} bug fixes (already fixed by NeoForge or another mod): {}", skipped.size(), skipped);
+        }
+
+        var errored = DebugifyErrorHandler.getErrored();
+        if (!errored.isEmpty()) {
+            List<String> errors = errored.stream()
+                    .map(BugFixData::bugId)
+                    .sorted()
+                    .toList();
+            LOGGER.warn("Failed to apply {} bug fixes: {}", errors.size(), errors);
+        }
+
         LOGGER.info("Successfully Debugify'd your game!");
     }
 
+    /**
+     * ModList may not be populated yet during early mixin loading, so all
+     * lookups must go through this guard.
+     */
+    public static boolean isModLoaded(String modId) {
+        ModList modList = ModList.get();
+        return modList != null && modList.isLoaded(modId);
+    }
+
+    public static String getVersion() {
+        ModList modList = ModList.get();
+        if (modList == null) return "unknown";
+        return modList.getModContainerById(MODID)
+                .map(c -> c.getModInfo().getVersion().toString())
+                .orElse("unknown");
+    }
+
     public static BugFix.Env getEnv() {
-        return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT ? BugFix.Env.CLIENT : BugFix.Env.SERVER;
+        return FMLEnvironment.dist == Dist.CLIENT ? BugFix.Env.CLIENT : BugFix.Env.SERVER;
     }
 }

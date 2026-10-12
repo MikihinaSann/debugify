@@ -1,7 +1,7 @@
 package dev.isxander.debugify.fixes;
 
+import dev.isxander.debugify.Debugify;
 import dev.isxander.debugify.mixinplugin.DebugifyDebugFlags;
-import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -15,7 +15,7 @@ public record BugFixData(String bugId, FixCategory category, BugFix.Env env, boo
     }
 
     public Set<String> getActiveConflicts() {
-        Set<String> conflicts = conflicts().stream().filter(id -> FabricLoader.getInstance().isModLoaded(id)).collect(Collectors.toSet());
+        Set<String> conflicts = conflicts().stream().filter(Debugify::isModLoaded).collect(Collectors.toSet());
         Set<String> apiConflicts = externalModConflicts.get(bugId());
         if (apiConflicts != null) conflicts.addAll(apiConflicts);
 
