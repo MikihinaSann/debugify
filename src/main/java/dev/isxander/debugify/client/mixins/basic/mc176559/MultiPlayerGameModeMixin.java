@@ -13,7 +13,10 @@ import java.util.Objects;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.world.item.ItemStack;
 
-@BugFix(id = "MC-176559", category = FixCategory.BASIC, env = BugFix.Env.CLIENT)
+// NeoForge already fixes this: ItemStack#shouldCauseBlockBreakReset ignores the
+// DAMAGE component for damageable items, and sameDestroyTarget calls it instead
+// of isSameItemSameComponents, so the wrap target no longer exists.
+@BugFix(id = "MC-176559", category = FixCategory.BASIC, env = BugFix.Env.CLIENT, modConflicts = "neoforge")
 @Mixin(value = MultiPlayerGameMode.class, priority = 1010)
 public class MultiPlayerGameModeMixin {
     // Fabric API also redirects here. WrapOperation is compatible

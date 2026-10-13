@@ -9,6 +9,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.LoadingModList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixins;
@@ -67,12 +68,15 @@ public class Debugify {
     }
 
     /**
-     * ModList may not be populated yet during early mixin loading, so all
-     * lookups must go through this guard.
+     * ModList is not populated during mixin loading, so early lookups fall back
+     * to LoadingModList, which is built during mod discovery before mixin
+     * configs are evaluated.
      */
     public static boolean isModLoaded(String modId) {
         ModList modList = ModList.get();
-        return modList != null && modList.isLoaded(modId);
+        if (modList != null) return modList.isLoaded(modId);
+        LoadingModList loadingModList = LoadingModList.get();
+        return loadingModList != null && loadingModList.getModFileById(modId) != null;
     }
 
     public static String getVersion() {
