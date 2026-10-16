@@ -72,7 +72,8 @@ repositories {
 
 dependencies {
     // MixinExtras (com.llamalad7 package) is bundled inside NeoForge at
-    // runtime; declared here so it is on the compile classpath.
+    // runtime; declared here so it is on the compile classpath. NeoForge
+    // 21.1.236+ bundles mixinextras-neoforge 0.5.3 (jarjar).
     implementation 'io.github.llamalad7:mixinextras-neoforge:0.5.3'
 }
 
@@ -83,6 +84,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             minecraft_version      : minecraft_version,
             minecraft_version_range: minecraft_version_range,
             neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
             loader_version_range   : loader_version_range,
             mod_id                 : mod_id,
             mod_name               : mod_name,

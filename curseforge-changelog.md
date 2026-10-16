@@ -69,7 +69,7 @@ NeoForge rewrites parts of vanilla bytecode, so several upstream mixins needed r
 ### Requirements
 
 - Minecraft 1.21.1
-- NeoForge 21.1.x (tested on 21.1.251)
+- NeoForge 21.1.236 or newer
 - Java 21
 
 ### Credits
