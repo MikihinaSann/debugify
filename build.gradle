@@ -15,6 +15,18 @@ base {
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+// Dev-only GameTest sources. Only compiled into the gameTestServer run -
+// the production jar still ships just sourceSets.main.
+sourceSets {
+    gameTest {
+        compileClasspath += sourceSets.main.output
+    }
+}
+configurations {
+    gameTestImplementation.extendsFrom implementation
+    gameTestRuntimeOnly.extendsFrom runtimeOnly
+}
+
 neoForge {
     // Specify the version of NeoForge to use.
     version = project.neo_version
@@ -46,6 +58,14 @@ neoForge {
             programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
 
+        gameTestServer {
+            type = 'gameTestServer'
+            programArgument '--nogui'
+            // Only run tests in our namespace; NeoForge runs every enabled
+            // namespace otherwise.
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'debugify'
+        }
+
         // applies to all the run configs above
         configureEach {
             // Enable all OS-specific fixes for debugging purposes (matches upstream)
@@ -62,8 +82,26 @@ neoForge {
         "${mod_id}" {
             sourceSet(sourceSets.main)
         }
+
+        // The same mod with the dev-only gameTest sources appended; only the
+        // gameTestServer run loads this model (see loadedMods below).
+        debugifyTest {
+            sourceSet(sourceSets.main)
+            sourceSet(sourceSets.gameTest)
+        }
     }
 }
+
+// Minecraft/NeoForge compile dependencies for the dev-only test sources.
+neoForge.addModdingDependenciesTo(sourceSets.gameTest)
+
+// The gameTest sources must never load in normal dev runs: restrict every
+// run to the main-only mod model and give the game test server the
+// main+gameTest variant.
+neoForge.runs.each { run ->
+    run.loadedMods.set(Set.of(neoForge.mods.debugify))
+}
+neoForge.runs.gameTestServer.loadedMods.set(Set.of(neoForge.mods.debugifyTest))
 
 repositories {
     mavenCentral()

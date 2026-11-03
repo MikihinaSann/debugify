@@ -3,6 +3,7 @@ package dev.isxander.debugify.client.gui;
 import dev.isxander.debugify.Debugify;
 import dev.isxander.debugify.client.DebugifyClient;
 import dev.isxander.debugify.config.DebugifyConfig;
+import dev.isxander.debugify.config.Issue2Tweak;
 import dev.isxander.debugify.fixes.BugFix;
 import dev.isxander.debugify.fixes.BugFixData;
 import dev.isxander.debugify.fixes.FixCategory;
@@ -87,6 +88,18 @@ public class DebugifyConfigScreen extends Screen {
                     }
                 });
             }
+        }
+
+        // Optional issue #2 tweaks - off by default, server authoritative
+        list.addHeader(Component.translatable("debugify.issue2_tweaks").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
+        list.addHeader(Component.translatable("debugify.issue2_tweaks.warning").withStyle(ChatFormatting.RED));
+        for (Issue2Tweak tweak : Issue2Tweak.values()) {
+            list.addToggle(
+                    Component.translatable(tweak.labelKey()),
+                    config.isIssue2TweakEnabled(tweak),
+                    false,
+                    value -> config.setIssue2TweakEnabled(tweak, value),
+                    Component.translatable(tweak.descriptionKey()));
         }
 
         // Misc section

@@ -36,6 +36,24 @@
     "basic.mc88371.DragonLandingPhaseMixin",
     "basic.mc89146.ChunkAccessMixin",
     "basic.mc93018.AnimalMixin",
-    "gameplay.mc8187.MixinTreeFeature"
+    "basic.mc95467.BreakDoorGoalMixin",
+    "gameplay.mc2164.ThrownEnderpearlMixin",
+    "gameplay.mc8187.MixinTreeFeature",
+    "gameplay.issue2.AbstractCauldronBlockMixin",
+    "gameplay.issue2.BlockMixin",
+    "gameplay.issue2.CactusBlockMixin",
+    "gameplay.issue2.CarvedPumpkinBlockMixin",
+    "gameplay.issue2.CauldronInteractionMixin",
+    "gameplay.issue2.EndPortalFrameBlockMixin",
+    "gameplay.issue2.FallingBlockEntityMixin",
+    "gameplay.issue2.FallingBlockMixin",
+    "gameplay.issue2.LavaFluidMixin",
+    "gameplay.issue2.LivingEntityMixin",
+    "gameplay.issue2.RangedAttackGoalMixin",
+    "gameplay.issue2.SeagrassBlockMixin",
+    "gameplay.issue2.SnowballMixin",
+    "gameplay.issue2.SugarCaneBlockMixin",
+    "gameplay.issue2.TallSeagrassBlockMixin",
+    "gameplay.issue2.WaterAnimalMixin"
   ]
 }

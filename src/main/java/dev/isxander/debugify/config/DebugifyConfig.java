@@ -4,8 +4,10 @@ import dev.isxander.debugify.Debugify;
 import dev.isxander.debugify.fixes.BugFixData;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.neoforged.fml.loading.FMLPaths;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,15 +20,35 @@ public class DebugifyConfig {
     private final Map<String, Boolean> jsonBugFixes = new HashMap<>();
     private final Map<BugFixData, Boolean> bugFixes = new TreeMap<>();
 
+    private final EnumMap<Issue2Tweak, Boolean> issue2Tweaks = new EnumMap<>(Issue2Tweak.class);
+
     public boolean defaultDisabled = false;
     public boolean optOutUpdater = false;
     public boolean gameplayFixesInMultiplayer = false;
 
     private boolean preloaded = false;
 
+    @Nullable
+    private final Path overridePath;
+
+    public DebugifyConfig() {
+        this(null);
+    }
+
+    // Lets tests exercise real load/save against an isolated file.
+    public DebugifyConfig(@Nullable Path overridePath) {
+        this.overridePath = overridePath;
+        for (Issue2Tweak tweak : Issue2Tweak.values()) {
+            issue2Tweaks.put(tweak, false);
+        }
+    }
+
     // Resolved lazily: FMLPaths is guaranteed set by the time config is used,
     // but this class is first instantiated during early mixin loading.
     private Path configPath() {
+        if (overridePath != null) {
+            return overridePath;
+        }
         return FMLPaths.CONFIGDIR.get().resolve("debugify.json");
     }
 
@@ -78,6 +100,19 @@ public class DebugifyConfig {
 
             jsonBugFixes.clear();
             jsonBugFixes.putAll(bugFixes);
+
+            // Issue #2 tweaks only ever turn on with an explicit JSON boolean
+            // true - absent keys, strings like "true" and malformed values
+            // all stay off. They are unaffected by default_disabled.
+            if (json.get("issue_2_tweaks") instanceof JsonObject tweaksJson) {
+                for (Issue2Tweak tweak : Issue2Tweak.values()) {
+                    JsonElement value = tweaksJson.get(tweak.key());
+                    issue2Tweaks.put(tweak, value != null
+                            && value.isJsonPrimitive()
+                            && value.getAsJsonPrimitive().isBoolean()
+                            && value.getAsBoolean());
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -97,6 +132,12 @@ public class DebugifyConfig {
             json.addProperty("gameplay_fixes_in_multiplayer", gameplayFixesInMultiplayer);
             json.addProperty("default_disabled", defaultDisabled);
 
+            JsonObject tweaksJson = new JsonObject();
+            for (Issue2Tweak tweak : Issue2Tweak.values()) {
+                tweaksJson.addProperty(tweak.key(), isIssue2TweakEnabled(tweak));
+            }
+            json.add("issue_2_tweaks", tweaksJson);
+
             Files.createFile(configPath);
             Files.writeString(configPath, gson.toJson(json));
         } catch (Exception e) {
@@ -110,6 +151,18 @@ public class DebugifyConfig {
 
     public Map<BugFixData, Boolean> getBugFixes() {
         return bugFixes;
+    }
+
+    public boolean isIssue2TweakEnabled(Issue2Tweak tweak) {
+        return issue2Tweaks.getOrDefault(tweak, false);
+    }
+
+    public void setIssue2TweakEnabled(Issue2Tweak tweak, boolean enabled) {
+        issue2Tweaks.put(tweak, enabled);
+    }
+
+    public Map<Issue2Tweak, Boolean> getIssue2Tweaks() {
+        return issue2Tweaks;
     }
 
     public boolean doesJsonHaveIdenticalKeys() {

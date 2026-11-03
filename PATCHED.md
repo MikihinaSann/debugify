@@ -38,6 +38,7 @@
 | Type     | Bug ID                                                | Name                                                                                                                                           |
 |----------|-------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
 | Basic    | [MC-2025](https://bugs.mojang.com/browse/MC-2025)     | Mobs going out of fenced areas/suffocate in blocks when loading chunks                                                                         |
+| Gameplay | [MC-2164](https://bugs.mojang.com/browse/MC-2164)     | Ender pearls can teleport entities inside solid blocks                                                                                         |
 | Basic    | [MC-7569](https://bugs.mojang.com/browse/MC-7569)     | RCON output has newlines removed                                                                                                               |
 | Gameplay | [MC-8187](https://bugs.mojang.com/browse/MC-8187)     | Two-by-two arrangements of jungle or spruce saplings cannot grow when there are adjacent blocks located north or west of the sapling formation |
 | Basic    | [MC-30391](https://bugs.mojang.com/browse/MC-30391)   | Chickens, blazes and the wither emit particles when landing from a height, despite falling slowly                                              |
@@ -46,6 +47,7 @@
 | Basic    | [MC-88371](https://bugs.mojang.com/browse/MC-88371)   | Ender Dragon flies down in the void when the exit portal is destroyed                                                                          |
 | Basic    | [MC-89146](https://bugs.mojang.com/browse/MC-89146)   | Pistons forget update when being reloaded                                                                                                      |
 | Basic    | [MC-93018](https://bugs.mojang.com/browse/MC-93018)   | Wild wolves show breeding hearts but do not breed                                                                                              |
+| Basic    | [MC-95467](https://bugs.mojang.com/browse/MC-95467)   | Zombies and vindicators keep breaking a door's position after the door is replaced, allowing them to break any block including bedrock           |
 | Basic    | [MC-100991](https://bugs.mojang.com/browse/MC-100991) | Killing entities with a fishing rod doesn't count as a kill                                                                                    |
 | Basic    | [MC-119417](https://bugs.mojang.com/browse/MC-119417) | A spectator can occupy a bed if they enter it and then are switched to spectator mode                                                          |
 | Basic    | [MC-119754](https://bugs.mojang.com/browse/MC-119754) | Firework boosting on elytra continues in spectator mode                                                                                        |

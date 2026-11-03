@@ -44,7 +44,8 @@
     "basic.mc90683.ClientPacketListenerMixin",
     "basic.mc93384.CommonHooksMixin",
     "gameplay.mc12829.LivingEntityMixin",
-    "gameplay.mc12829.PlayerMixin"
+    "gameplay.mc12829.PlayerMixin",
+    "gameplay.issue2.SnowGolemHeadLayerMixin"
   ],
   "mixins": [
     "basic.mc176559.ItemStackAccessor"

@@ -13,6 +13,8 @@
 
 </div>
 
+See [docs/issue-2.md](docs/issue-2.md) for the issue-2 fixes and optional tweaks; run tests with `gradlew runGameTestServer`.
+
 ## What does this mod replace?
 This mod replaces many mods and implements fixes from some others
 
