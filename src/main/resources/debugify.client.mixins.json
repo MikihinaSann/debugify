@@ -45,7 +45,8 @@
     "basic.mc93384.CommonHooksMixin",
     "gameplay.mc12829.LivingEntityMixin",
     "gameplay.mc12829.PlayerMixin",
-    "gameplay.issue2.SnowGolemHeadLayerMixin"
+    "gameplay.issue2.SnowGolemHeadLayerMixin",
+    "gameplay.issue3.VillagerRendererMixin"
   ],
   "mixins": [
     "basic.mc176559.ItemStackAccessor"

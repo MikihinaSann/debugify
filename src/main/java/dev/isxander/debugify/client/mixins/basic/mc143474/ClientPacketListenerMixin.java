@@ -9,10 +9,12 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.Connection;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
+import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @BugFix(id = "MC-143474", category = FixCategory.BASIC, env = BugFix.Env.CLIENT)
 @Mixin(ClientPacketListener.class)
@@ -21,9 +23,17 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         super(client, connection, commonListenerCookie);
     }
 
-    @ModifyExpressionValue(method = "handleRespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;createPlayer(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/stats/StatsCounter;Lnet/minecraft/client/ClientRecipeBook;ZZ)Lnet/minecraft/client/player/LocalPlayer;"))
+    @ModifyExpressionValue(method = "handleRespawn", require = 2, at = {
+            @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;createPlayer(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/stats/StatsCounter;Lnet/minecraft/client/ClientRecipeBook;ZZ)Lnet/minecraft/client/player/LocalPlayer;"),
+            @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;createPlayer(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/stats/StatsCounter;Lnet/minecraft/client/ClientRecipeBook;)Lnet/minecraft/client/player/LocalPlayer;")
+    })
     private LocalPlayer persistInventorySlot(LocalPlayer newPlayer) {
         newPlayer.getInventory().selected = minecraft.player.getInventory().selected;
         return newPlayer;
+    }
+
+    @Inject(method = "handleRespawn", at = @At("RETURN"))
+    private void syncInventorySlot(ClientboundRespawnPacket packet, CallbackInfo ci) {
+        connection.send(new ServerboundSetCarriedItemPacket(minecraft.player.getInventory().selected));
     }
 }

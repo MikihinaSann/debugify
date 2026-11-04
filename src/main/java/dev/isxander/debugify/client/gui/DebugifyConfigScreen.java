@@ -4,6 +4,7 @@ import dev.isxander.debugify.Debugify;
 import dev.isxander.debugify.client.DebugifyClient;
 import dev.isxander.debugify.config.DebugifyConfig;
 import dev.isxander.debugify.config.Issue2Tweak;
+import dev.isxander.debugify.config.Issue3Tweak;
 import dev.isxander.debugify.fixes.BugFix;
 import dev.isxander.debugify.fixes.BugFixData;
 import dev.isxander.debugify.fixes.FixCategory;
@@ -21,6 +22,8 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.FormattedCharSequence;
 import net.neoforged.fml.ModList;
 
 import java.util.ArrayList;
@@ -59,6 +62,12 @@ public class DebugifyConfigScreen extends Screen {
                 .build());
     }
 
+    private void addWrappedWarning(Component warning) {
+        for (net.minecraft.network.chat.FormattedText line : font.getSplitter().splitLines(warning, list.getRowWidth() - 8, Style.EMPTY)) {
+            list.addHeader(Language.getInstance().getVisualOrder(line));
+        }
+    }
+
     private void rebuildEntries() {
         list.clearAll();
         DebugifyConfig config = Debugify.CONFIG;
@@ -92,13 +101,24 @@ public class DebugifyConfigScreen extends Screen {
 
         // Optional issue #2 tweaks - off by default, server authoritative
         list.addHeader(Component.translatable("debugify.issue2_tweaks").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
-        list.addHeader(Component.translatable("debugify.issue2_tweaks.warning").withStyle(ChatFormatting.RED));
+        addWrappedWarning(Component.translatable("debugify.issue2_tweaks.warning").withStyle(ChatFormatting.RED));
         for (Issue2Tweak tweak : Issue2Tweak.values()) {
             list.addToggle(
                     Component.translatable(tweak.labelKey()),
                     config.isIssue2TweakEnabled(tweak),
                     false,
                     value -> config.setIssue2TweakEnabled(tweak, value),
+                    Component.translatable(tweak.descriptionKey()));
+        }
+
+        list.addHeader(Component.translatable("debugify.issue3_tweaks").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
+        addWrappedWarning(Component.translatable("debugify.issue3_tweaks.warning").withStyle(ChatFormatting.RED));
+        for (Issue3Tweak tweak : Issue3Tweak.values()) {
+            list.addToggle(
+                    Component.translatable(tweak.labelKey()),
+                    config.isIssue3TweakEnabled(tweak),
+                    false,
+                    value -> config.setIssue3TweakEnabled(tweak, value),
                     Component.translatable(tweak.descriptionKey()));
         }
 
@@ -150,6 +170,10 @@ public class DebugifyConfigScreen extends Screen {
             addEntry(new HeaderEntry(text));
         }
 
+        void addHeader(FormattedCharSequence text) {
+            addEntry(new HeaderEntry(text));
+        }
+
         void addToggle(Component name, boolean initialValue, boolean unavailable,
                         Consumer<Boolean> onChange, Component tooltip) {
             addEntry(new ToggleEntry(name, initialValue, unavailable, onChange, tooltip));
@@ -168,19 +192,30 @@ public class DebugifyConfigScreen extends Screen {
 
         final class HeaderEntry extends Entry {
             private final Component text;
+            private final FormattedCharSequence sequence;
 
             HeaderEntry(Component text) {
                 this.text = text;
+                this.sequence = null;
+            }
+
+            HeaderEntry(FormattedCharSequence text) {
+                this.text = null;
+                this.sequence = text;
             }
 
             @Override
             public void render(GuiGraphics graphics, int index, int rowTop, int left, int rowWidth, int rowHeight,
                                int mouseX, int mouseY, boolean hovered, float delta) {
-                graphics.drawString(font, text, left + 4, rowTop + 4, 0xFFFFFF);
+                if (sequence != null) {
+                    graphics.drawString(font, sequence, left + 4, rowTop + 4, 0xFFFFFF);
+                } else {
+                    graphics.drawString(font, text, left + 4, rowTop + 4, 0xFFFFFF);
+                }
             }
 
             public Component getNarration() {
-                return text;
+                return text != null ? text : Component.empty();
             }
 
             @Override
@@ -197,14 +232,19 @@ public class DebugifyConfigScreen extends Screen {
         // ── Generic on/off toggle row ─────────────────────────────────────
 
         final class ToggleEntry extends Entry {
+            private final Component name;
             private final CycleButton<Boolean> button;
+            private final Component tooltip;
 
             ToggleEntry(Component name, boolean initialValue, boolean unavailable,
                         Consumer<Boolean> onChange, Component tooltip) {
+                this.name = name;
+                this.tooltip = tooltip;
                 CycleButton.Builder<Boolean> builder = CycleButton.booleanBuilder(
                         Component.translatable("debugify.fix.enabled"),
                         Component.translatable("debugify.fix.disabled"))
-                        .withInitialValue(initialValue);
+                        .withInitialValue(initialValue)
+                        .displayOnlyValue();
                 this.button = builder.create(0, 0, TOGGLE_WIDTH, 20, name, (b, v) -> onChange.accept(v));
                 if (unavailable) button.active = false;
                 if (tooltip != null) button.setTooltip(Tooltip.create(tooltip));
@@ -213,9 +253,26 @@ public class DebugifyConfigScreen extends Screen {
             @Override
             public void render(GuiGraphics graphics, int index, int rowTop, int left, int rowWidth, int rowHeight,
                                int mouseX, int mouseY, boolean hovered, float delta) {
-                button.setX(left + rowWidth - TOGGLE_WIDTH);
+                int buttonLeft = left + rowWidth - TOGGLE_WIDTH;
+                int labelWidth = buttonLeft - left - 8;
+                if (font.width(name) <= labelWidth) {
+                    graphics.drawString(font, name, left + 4, rowTop + 5, 0xFFFFFF);
+                } else {
+                    String clipped = font.plainSubstrByWidth(name.getString(), labelWidth - font.width("...")) + "...";
+                    graphics.drawString(font, clipped, left + 4, rowTop + 5, 0xFFFFFF);
+                }
+                button.setX(buttonLeft);
                 button.setY(rowTop);
                 button.render(graphics, mouseX, mouseY, delta);
+                if (hovered && mouseX < buttonLeft) {
+                    if (font.width(name) > labelWidth && tooltip != null) {
+                        setTooltipForNextRenderPass(Component.empty().append(name).append("\n").append(tooltip));
+                    } else if (font.width(name) > labelWidth) {
+                        setTooltipForNextRenderPass(name);
+                    } else if (tooltip != null) {
+                        setTooltipForNextRenderPass(tooltip);
+                    }
+                }
             }
 
             @Override
@@ -234,7 +291,7 @@ public class DebugifyConfigScreen extends Screen {
             }
 
             public Component getNarration() {
-                return button.getMessage();
+                return name.copy().append(": ").append(button.getMessage());
             }
         }
 
@@ -252,10 +309,16 @@ public class DebugifyConfigScreen extends Screen {
                 this.name = Component.literal(bug.bugId());
                 List<Component> description = buildDescription(bug);
 
-                CycleButton.Builder<Boolean> builder = CycleButton.booleanBuilder(
-                        Component.translatable("debugify.fix.enabled"),
-                        Component.translatable("debugify.fix.disabled"))
-                        .withInitialValue(enabled);
+                CycleButton.Builder<Boolean> builder = isNeoForgeDuplicate(bug)
+                        ? CycleButton.<Boolean>builder(value -> Component.translatable("debugify.fix.fixed_by_neoforge"))
+                                .withValues(false, true)
+                                .withInitialValue(enabled)
+                                .displayOnlyValue()
+                        : CycleButton.booleanBuilder(
+                                Component.translatable("debugify.fix.enabled"),
+                                Component.translatable("debugify.fix.disabled"))
+                                .withInitialValue(enabled)
+                                .displayOnlyValue();
                 this.button = builder.create(0, 0, TOGGLE_WIDTH, 20, Component.literal(""),
                         (b, v) -> Debugify.CONFIG.getBugFixes().replace(bug, v));
                 if (unavailable) {
@@ -264,6 +327,10 @@ public class DebugifyConfigScreen extends Screen {
                 if (!description.isEmpty()) {
                     button.setTooltip(Tooltip.create(joinLines(description)));
                 }
+            }
+
+            private static boolean isNeoForgeDuplicate(BugFixData bug) {
+                return bug.bugId().equals("MC-176559") && bug.getActiveConflicts().contains("neoforge");
             }
 
             private boolean computeUnavailable(BugFixData bug) {
@@ -290,6 +357,11 @@ public class DebugifyConfigScreen extends Screen {
                             .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
                 }
                 for (String conflictMod : conflicts) {
+                    if (isNeoForgeDuplicate(bug) && conflictMod.equals("neoforge")) {
+                        description.add(Component.translatable("debugify.error.fixed_by_neoforge")
+                                .withStyle(ChatFormatting.GREEN));
+                        continue;
+                    }
                     String modName = ModList.get().getModContainerById(conflictMod)
                             .map(c -> c.getModInfo().getDisplayName())
                             .orElse(conflictMod);

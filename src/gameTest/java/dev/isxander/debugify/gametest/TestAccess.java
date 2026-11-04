@@ -41,6 +41,10 @@ final class TestAccess {
         void hitEntity(Entity entity) {
             this.onHitEntity(new EntityHitResult(entity));
         }
+
+        void hit(HitResult result) {
+            this.onHit(result);
+        }
     }
 
     /** Lets tests aim the goal at a specific door position like canUse() would. */

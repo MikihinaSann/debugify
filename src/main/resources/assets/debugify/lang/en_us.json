@@ -104,5 +104,16 @@
   "debugify.issue2_tweak.lava_converts_waterlogged_coral": "Lava Hardens Waterlogged Coral",
   "debugify.issue2_tweak.lava_converts_waterlogged_coral.description": "Lava flowing over a waterlogged coral plant or fan hardens it into stone.",
   "debugify.issue2_tweak.villager_beds_explode_in_invalid_dimensions": "Villager Beds Explode in Invalid Dimensions",
-  "debugify.issue2_tweak.villager_beds_explode_in_invalid_dimensions.description": "Villagers trying to sleep in a bed where beds do not work (e.g. the Nether or End) explode the bed instead of sleeping."
+  "debugify.issue2_tweak.villager_beds_explode_in_invalid_dimensions.description": "Villagers trying to sleep in a bed where beds do not work (e.g. the Nether or End) explode the bed instead of sleeping.",
+  "debugify.issue3_tweaks": "Optional Issue #3 Tweaks",
+  "debugify.issue3_tweaks.warning": "WARNING: these are not bug fixes - they alter vanilla behaviour. All off by default. The bell and skeleton horse tweaks apply on the server only; the villager armor tweak only changes what your client renders.",
+  "debugify.issue3_tweak.dropped_items_ring_bells": "Dropped Items Ring Bells",
+  "debugify.issue3_tweak.dropped_items_ring_bells.description": "Item entities whose bounding box touches a bell's collision shape ring it once per contact. Applied server-side only.",
+  "debugify.issue3_tweak.tame_skeleton_horses_on_interaction": "Tame Skeleton Horses on Interaction",
+  "debugify.issue3_tweak.tame_skeleton_horses_on_interaction.description": "Interacting with an untamed adult skeleton horse using an empty hand tames it before the normal mounting rules run. Applied server-side only.",
+  "debugify.issue3_tweak.visible_villager_armor": "Visible Villager Armor",
+  "debugify.issue3_tweak.visible_villager_armor.description": "Renders the items a villager wears in its armor slots. Client-side visual only - villager equipment mechanics are unchanged.",
+  "debugify.error.fixed_by_neoforge": "Already fixed by NeoForge; Debugify skips its duplicate patch.",
+  "debugify.fix.fixed_by_neoforge": "Fixed by NeoForge",
+  "debugify.fix_explanation.mc-261666": "Drops a villager's worn and held items next to it when a zombie converts it, instead of deleting the equipment together with the discarded villager."
 }

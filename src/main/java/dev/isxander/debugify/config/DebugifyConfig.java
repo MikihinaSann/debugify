@@ -21,6 +21,7 @@ public class DebugifyConfig {
     private final Map<BugFixData, Boolean> bugFixes = new TreeMap<>();
 
     private final EnumMap<Issue2Tweak, Boolean> issue2Tweaks = new EnumMap<>(Issue2Tweak.class);
+    private final EnumMap<Issue3Tweak, Boolean> issue3Tweaks = new EnumMap<>(Issue3Tweak.class);
 
     public boolean defaultDisabled = false;
     public boolean optOutUpdater = false;
@@ -40,6 +41,9 @@ public class DebugifyConfig {
         this.overridePath = overridePath;
         for (Issue2Tweak tweak : Issue2Tweak.values()) {
             issue2Tweaks.put(tweak, false);
+        }
+        for (Issue3Tweak tweak : Issue3Tweak.values()) {
+            issue3Tweaks.put(tweak, false);
         }
     }
 
@@ -113,6 +117,16 @@ public class DebugifyConfig {
                             && value.getAsBoolean());
                 }
             }
+
+            if (json.get("issue_3_tweaks") instanceof JsonObject issue3Json) {
+                for (Issue3Tweak tweak : Issue3Tweak.values()) {
+                    JsonElement value = issue3Json.get(tweak.key());
+                    issue3Tweaks.put(tweak, value != null
+                            && value.isJsonPrimitive()
+                            && value.getAsJsonPrimitive().isBoolean()
+                            && value.getAsBoolean());
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -137,6 +151,12 @@ public class DebugifyConfig {
                 tweaksJson.addProperty(tweak.key(), isIssue2TweakEnabled(tweak));
             }
             json.add("issue_2_tweaks", tweaksJson);
+
+            JsonObject issue3Json = new JsonObject();
+            for (Issue3Tweak tweak : Issue3Tweak.values()) {
+                issue3Json.addProperty(tweak.key(), isIssue3TweakEnabled(tweak));
+            }
+            json.add("issue_3_tweaks", issue3Json);
 
             Files.createFile(configPath);
             Files.writeString(configPath, gson.toJson(json));
@@ -163,6 +183,18 @@ public class DebugifyConfig {
 
     public Map<Issue2Tweak, Boolean> getIssue2Tweaks() {
         return issue2Tweaks;
+    }
+
+    public boolean isIssue3TweakEnabled(Issue3Tweak tweak) {
+        return issue3Tweaks.getOrDefault(tweak, false);
+    }
+
+    public void setIssue3TweakEnabled(Issue3Tweak tweak, boolean enabled) {
+        issue3Tweaks.put(tweak, enabled);
+    }
+
+    public Map<Issue3Tweak, Boolean> getIssue3Tweaks() {
+        return issue3Tweaks;
     }
 
     public boolean doesJsonHaveIdenticalKeys() {

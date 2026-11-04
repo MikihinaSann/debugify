@@ -153,7 +153,7 @@ public class DebugifyGameTests {
 
     @GameTest(template = EMPTY, batch = BATCH)
     public void fixesAppliedWithoutMixinErrors(GameTestHelper helper) {
-        Set<String> ours = Set.of("MC-2164", "MC-95467");
+        Set<String> ours = Set.of("MC-2164", "MC-95467", "MC-121706", "MC-261666");
         for (BugFixData data : DebugifyErrorHandler.getErrored()) {
             helper.assertFalse(ours.contains(data.bugId()), "mixin errored: " + data.bugId());
         }
