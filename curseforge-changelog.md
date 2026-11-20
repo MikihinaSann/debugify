@@ -1,5 +1,12 @@
 # Debugify Forge 1.20.1 — Changelog
 
+## 1.20.1+1.3
+
+### Fixed
+
+- **MC-249414** — `rendertype_entity_translucent_emissive` declared a `Sampler2` it never samples, so the log filled with "could not bind sampler" warnings every frame. The unused sampler declaration is now skipped.
+- **MC-214147** — Skeletons wearing freeze-immune armor (e.g. leather) no longer convert to strays in powder snow.
+
 ## 1.20.1+1.2
 
 ### Fixed
