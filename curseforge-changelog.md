@@ -1,5 +1,11 @@
 # Debugify Forge 1.20.1 — Changelog
 
+## 1.20.1+1.2
+
+### Fixed
+
+- **Debug overlay randomly opening after F3+F4** — Reworked the MC-183776 fix. The previous mixin suppressed `handleDebugKeys` after the game mode switcher opened, which also prevented the `handledDebugKey` flag from being set on F4. When the queued F3-release ran after the screen closed, `keyPress` saw no flag and toggled the debug overlay. The flag is now cleared on F3 release instead of suppressing the vanilla handler.
+
 ## 1.20.1+1.1
 
 ### Fixed
