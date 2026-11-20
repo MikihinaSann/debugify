@@ -1,10 +1,17 @@
 # Debugify NeoForge 1.21.1 — Changelog
 
-## 1.21.1+1.2
+## 1.21.1+1.3
 
 ### Fixed
 
 - **Debug overlay randomly opening after F3+F4** — Reworked the MC-183776 fix. The previous mixin suppressed `handleDebugKeys` after the game mode switcher opened, which also prevented the `handledDebugKey` flag from being set on F4. When the queued F3-release ran after the screen closed, `keyPress` saw no flag and toggled the debug overlay. The flag is now cleared on F3 release instead of suppressing the vanilla handler.
+- **MC-249414** — `rendertype_entity_translucent_emissive` declared a `Sampler2` it never samples, so the log filled with "could not bind sampler" warnings every frame. The unused sampler declaration is now skipped.
+- **MC-214147** — Skeletons wearing freeze-immune armor (e.g. leather) no longer convert to strays in powder snow.
+
+## 1.21.1+1.2
+
+### Fixed
+
 - **MC-261666** — Villagers no longer lose their worn and held equipment when a zombie converts them; items drop next to the zombie villager instead of being deleted.
 
 ### Added
