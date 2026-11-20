@@ -1,5 +1,24 @@
 # Debugify NeoForge 1.21.1 — Changelog
 
+## 1.21.1+1.2
+
+### Fixed
+
+- **Debug overlay randomly opening after F3+F4** — Reworked the MC-183776 fix. The previous mixin suppressed `handleDebugKeys` after the game mode switcher opened, which also prevented the `handledDebugKey` flag from being set on F4. When the queued F3-release ran after the screen closed, `keyPress` saw no flag and toggled the debug overlay. The flag is now cleared on F3 release instead of suppressing the vanilla handler.
+- **MC-261666** — Villagers no longer lose their worn and held equipment when a zombie converts them; items drop next to the zombie villager instead of being deleted.
+
+### Added
+
+- **Optional gameplay tweaks** (all off by default, under "Optional Issue #3 Tweaks"):
+  - Dropped items ring bells (server-side)
+  - Tame skeleton horses on interaction (server-side)
+  - Visible villager armor (client-side render only)
+
+### Changed
+
+- Clearer config screen: option labels are now separated from the compact toggles.
+- Improved reliability of the MC-143474 and MC-159163 fixes.
+
 ## 1.21.1+1.1 (Initial NeoForge Release)
 
 ### Added
